@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 用户登陆
 func ClientLogin(ctx *gin.Context) {
 	jwtService := services.NewJWTService()
 	clientAuthService := services.NewUserService(databases.DB)
@@ -29,7 +28,6 @@ func ClientLogin(ctx *gin.Context) {
 	})
 }
 
-// 用户注册
 func ClientRegister(ctx *gin.Context) {
 	jwtService := services.NewJWTService()
 	clientAuthService := services.NewUserService(databases.DB)
@@ -45,4 +43,5 @@ func ClientRegister(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "registration success",
 	})
+
 }
