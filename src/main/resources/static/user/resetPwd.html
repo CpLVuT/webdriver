@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户修改密码</title>
+    <link href="../style.css" rel="stylesheet" type="text/css" />
+    <style>
+        .resetButton {
+            display: block;
+            padding: 12px 140px;
+            border-radius: 5px;
+            font-size: 15px;
+            outline: none;
+            border: none;
+            cursor: pointer;
+            background: #0fbcf9;
+            color: white;
+            margin: 10px 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="menu">
+    <div class="logo">
+        在线网盘
+    </div>
+    <div class="menuItems">
+<!--        <a class="menuItem" href="../info/money.html" style="color:white;">打赏开发者</a>-->
+<!--        <a class="menuItem" href="../info/techSupport.html" style="color:white;">技术支持</a>-->
+<!--        <a class="menuItem" href="../info/about.html" style="color:white;">关于我们</a>-->
+    </div>
+</div>
+<div class="content">多端并用<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数据随身携带</div>
+<div class="card">
+    <form id="userResetPwd" action="userResetPwd" method="post">
+        <label>用户名： <input class="inputStyle" type="text" id="username" name="username"></label><br/>
+        <label>修改后密码： <input class="inputStyle" type="password" id="password" name="password"></label><br/>
+        <input class="resetButton" type="button" value="提交" onclick="changePwd()">
+    </form>
+</div>
+<script>
+    function changePwd(){
+        let username = document.getElementById("username").value;
+        let password = document.getElementById("password").value;
+        if(username.length == 0 || password.length == 0){
+            alert("请输入用户名和修改后密码！");
+        }else {
+            document.getElementById("userResetPwd").submit();
+        }
+    }
+</script>
+</body>
+</html>

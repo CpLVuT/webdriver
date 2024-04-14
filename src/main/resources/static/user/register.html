@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户注册</title>
+    <link href="../style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div class="menu">
+    <div class="logo">
+        在线网盘
+    </div>
+    <div class="menuItems">
+<!--        <a class="menuItem" href="../info/money.html" style="color:white;">打赏开发者</a>-->
+<!--        <a class="menuItem" href="../info/techSupport.html" style="color:white;">技术支持</a>-->
+<!--        <a class="menuItem" href="../info/about.html" style="color:white;">关于我们</a>-->
+    </div>
+</div>
+<div class="content">多端并用<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数据随身携带</div>
+<div class="card">
+    <form action="userRegister" method="post">
+        <div id="errorMessage" style="color: red;font-size: 15px;"></div>
+        <label>用户名： <input class="inputStyle" type="text" name="username"></label><br/>
+        <label>密码： <input class="inputStyle" type="password" name="password"></label><br/>
+        <input type="submit">
+    </form>
+</div>
+<script>
+    window.onload = function() {
+        const params = new URLSearchParams(window.location.search);
+        if(params.has('error')) {
+            document.getElementById('errorMessage').innerText = "用户已经存在！";
+        }
+    }
+</script>
+</body>
+</html>

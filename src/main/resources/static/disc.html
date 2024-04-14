@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+        <meta charset="UTF-8">
+<!--    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>-->
+    <title>在线网盘</title>
+    <script src="getUser.js"></script>
+    <link href="style.css" rel="stylesheet" type="text/css"/>
+    <style>
+        .card {
+            position: absolute;
+            top: 53%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            height: 85%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: #111111 1px 1px 10px;
+            overflow: hidden;
+        }
+        table {
+            width: 80%;
+            margin: auto;
+            text-align: center;
+            border-radius: 10px;
+            border-collapse: collapse;
+        }
+        tr{
+            border: solid 1px #bfbfbf;
+        }
+        th, td {
+            padding: 10px;
+        }
+        .toolbar {
+            /*border: solid;*/
+            margin-top: 20px;
+            margin-left: 10%;
+        }
+        button {
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            background: #0fbcf9;
+            color: white;
+            margin: 0 10px;
+        }
+        #dialog {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border: 1px solid #000;
+            padding: 20px;
+            z-index: 100;
+        }
+        #overlay {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 50;
+        }
+        .searchName{
+            font-size: 16px;
+            width: 200px;
+            /* padding: 14px 10px; */
+            outline: none;
+            border: solid 1px #d2dae2;
+            text-align: left;
+            margin: 5px 0;
+        }
+        .searchTime{
+            font-size: 16px;
+            width: 200px;
+            /* padding: 14px 10px; */
+            outline: none;
+            border: solid 1px #d2dae2;
+            text-align: left;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="menu">
+    <div class="logo">
+        在线网盘
+    </div>
+    <div class="menuItems">
+        <text id="username" class="menuItem" href=""></text>
+        <text id="logout" class="menuItem" onclick="logout()">退出登录</text>
+    </div>
+</div>
+<div class="card">
+    <div class="toolbar">
+        <button onclick='document.getElementById("ulFile").click()'>上传</button>
+<!--        <button onclick='uploadFiles()'>上传</button>-->
+        <button onclick="downloadFiles()">下载</button>
+        <button onclick="deleteFiles()">删除</button>
+        <button id="openDialogBtn">移动</button>
+    </div>
+    <div class="searchDiv" style="margin-top: 10px;margin-left: 10%">
+        文件名称：<input class="searchName" type="text" id="searchFileName"  placeholder="请输入要搜索的文件名">
+        &nbsp;&nbsp;开始时间：<input class="searchTime" type="datetime-local" id="searchFileStartTime">
+        &nbsp;&nbsp;结束时间：<input class="searchTime" type="datetime-local" id="searchFileEndTime">
+        &nbsp;&nbsp;<button style="float: right;margin-right: 140px;" onclick="fetchFiles(1)">搜索</button>
+    </div>
+    <div class="filetable" style="padding-top: 20px">
+        <form action="upload" method="post" enctype="multipart/form-data" style="display:none;">
+<!--            <input id="ulFile" type="file" name="file" onchange='document.getElementById("ulBtn").click()'>-->
+            <input id="ulFile" type="file" name="file" onchange='uploadFiles()'>
+<!--            <input id="ulBtn" type="submit" value="开始上传">-->
+        </form>
+<!--        <form action="downloadFile" method="post">-->
+<!--            <input id="dlBtn" type="submit" value="下载" style="display:none;">-->
+<!--            <input id="deleteBtn" type="submit" value="删除" style="display:none;">-->
+<!--            <table id="fileList">-->
+<!--                <tr class="tableHeader">-->
+<!--                    <th></th>-->
+<!--                    <th>文件名称</th>-->
+<!--                    <th>文件大小</th>-->
+<!--                    <th>上传时间</th>-->
+<!--                </tr>-->
+<!--            </table>-->
+            <table>
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>文件名称</th>
+                    <th>文件大小</th>
+                    <th>文件路径</th>
+                    <th>上传时间</th>
+                </tr>
+                </thead>
+                <tbody id="filesList">
+                <!-- 文件列表将通过JavaScript动态填充 -->
+                </tbody>
+            </table>
+            <div style="padding: 14px 15px 10px;
+                        text-align: center;
+                        overflow: hidden;
+                        clear: both;">
+                <button id="prevPage" onclick="goToPrevPage()">上一页</button>
+                第<span id="pagination"></span>页
+                <button id="nextPage" onclick="goToNextPage()">下一页</button>
+                总<span id="totalPage"></span>页
+            </div>
+<!--        </form>-->
+    </div>
+    <div id="overlay"></div>
+    <div id="dialog">
+        <p>请输入移动的路径：</p>
+        <input type="text" id="inputText" placeholder="比如 D://netdisk/study">
+        <button id="confirmBtn">Confirm</button>
+        <button id="cancelBtn">Cancel</button>
+    </div>
+</div>
+    <script>
+        document.getElementById('openDialogBtn').addEventListener('click', function() {
+            let selectedFiles = document.querySelectorAll('input[type="checkbox"]:checked');
+            if(selectedFiles.length == 0){
+                alert("请选择需要移动的文件！");
+                return;
+            }
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('dialog').style.display = 'block';
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', function() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('dialog').style.display = 'none';
+        });
+
+        document.getElementById('confirmBtn').addEventListener('click', function() {
+            let selectedFiles = document.querySelectorAll('input[type="checkbox"]:checked');
+            if(selectedFiles.length == 0){
+                alert("请选择需要移动的文件！");
+                return;
+            }
+            let fileIds = [];
+            selectedFiles.forEach(function(checkbox) {
+                console.log(checkbox.value)
+                fileIds.push(checkbox.value);
+            });
+            var inputText = document.getElementById('inputText').value;
+            // 检查输入
+            if(inputText.length <= 0){
+                alert("请输入移动的路径！");
+                return;
+            }
+            var xhr = new XMLHttpRequest();
+            xhr.open('get', '/file/moveFile?fileIds=' + fileIds + '&movePath=' + inputText, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    alert("操作成功！");
+                    fetchFiles(currentPage);
+                }else {
+                    if(xhr.readyState === 4){
+                        alert("移动文件失败！")
+                    }
+                }
+            };
+            xhr.send();
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('dialog').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
